@@ -1,0 +1,53 @@
+\frametitle{Interactive Web Dashboard: Live Demo}
+\textit{\small Presenter: Apilli Barbra Ebal \hfill [25:00 -- 27:30]}
+\begin{columns}
+\begin{column}{0.55\textwidth}
+\textbf{Dashboard Features:}
+\begin{enumerate}
+    \item \textbf{User Controls:} Select crop, district, horizon
+    \item \textbf{Real-time LSTM Training:} Model trains live
+    \item \textbf{Interactive Plotly Chart:}
+    \begin{itemize}
+        \item Historical train data
+        \item Test actuals vs LSTM predictions
+        \item Future forecast trajectory
+    \end{itemize}
+    \item \textbf{Performance Metrics:} MAE, RMSE, MAPE
+    \item \textbf{Model Comparison Panel}: ARIMA vs Prophet vs LSTM
+\end{enumerate}
+
+\vspace{0.5em}
+\begin{lstlisting}
+# Launch command
+streamlit run app.py
+\end{lstlisting}
+\end{column}
+\begin{column}{0.42\textwidth}
+\begin{lstlisting}
+# Dashboard core: app.py
+import streamlit as st
+import tensorflow as tf
+
+st.title("Deep Market Forecaster")
+
+# User selects parameters
+district = st.selectbox(
+    "District:",
+    ['Kampala','Gulu','Mbale'])
+crop = st.selectbox(
+    "Crop:",
+    ['Maize','Beans',
+     'Cassava flour'])
+horizon = st.radio(
+    "Forecast Horizon:",
+    ["4 Weeks", "8 Weeks"])
+
+# Generate button triggers
+# LSTM training + forecasting
+if st.button("Generate Forecast"):
+    model = train_lstm(data)
+    forecast = predict(model)
+    st.plotly_chart(fig)
+\end{lstlisting}
+\end{column}
+\end{columns}
