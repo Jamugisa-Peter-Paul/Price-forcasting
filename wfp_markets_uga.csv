@@ -1,0 +1,97 @@
+market_id,market,countryiso3,admin1,admin2,latitude,longitude
+257,Kiboga,UGA,Kyankwanzi,Kiboga,0.92,31.77
+258,Owino,UGA,Kampala,Central Kampala,0.32,32.57
+259,Iganga,UGA,Iganga,Kigulu,0.61,33.47
+260,Jinja,UGA,Jinja,Jinja Municipality,0.42,33.2
+261,Kapchorwa,UGA,Kween,Kween,1.38,34.52
+262,Gulu,UGA,Gulu,Gulu Municipality,2.77,32.31
+263,Lira,UGA,Lira,Lira Municipality,2.23,32.91
+264,Mbarara,UGA,Mbarara,Mbarara Municipality,-0.61,30.65
+2343,Makaratin,UGA,Abim,Labwor,2.71,33.64
+2344,Kotido,UGA,Kotido,Jie,3,34.11
+2345,Kaabong,UGA,Kaabong,Dodoth,3.54,34.12
+2346,Karita,UGA,Amudat,Upe,1.54,34.83
+2347,Namalu,UGA,Nakapiripirit,Kadani,1.79,34.6
+2348,Mbale,UGA,Mbale,Mbale Municipality,1.07,34.18
+2349,Soroti,UGA,Soroti,Soroti Municipality,1.71,33.62
+2665,Busia,UGA,Busia,Samia-bugwe,0.47,34.09
+2692,Kabale,UGA,Kabale,Kabale Municipality,-1.25,29.99
+2693,Masindi,UGA,Masindi,Buruli M,1.69,31.71
+6147,Moroto,UGA,Moroto,Moroto Municipality,2.53,34.65
+6148,Arua,UGA,Arua,Arua Municipality,3.02,30.91
+6149,Kasese,UGA,Kasese,Busongora,0.17,30.07
+6150,Tororo,UGA,Tororo,Tororo Municipality,0.69,34.18
+6151,Hoima,UGA,Hoima,Bugahya,1.43,31.35
+6292,Fort Portal,UGA,Kabarole,Fort Portal Municipality,0.66,30.28
+6404,Bidibidi (refugee settlement),UGA,Yumbe,Aringa,3.36,31.35
+6405,Palorinya (refugee settlement),UGA,Moyo,Obongi,3.47,31.63
+6406,Palabek (refugee settlement),UGA,Lamwo,Lamwo,3.34,32.47
+6407,Kyaka II (refugee settlement),UGA,Kyegegwa,Kyaka,0.36,31.09
+6408,Lobule (refugee settlement),UGA,Koboko,Koboko,3.39,31.03
+6409,Kiryandongo (refugee settlement),UGA,Kiryandongo,Kibanda,1.94,32.21
+6410,Rwamwanja (refugee settlement),UGA,Kamwenge,Kibale,0.31,30.68
+6411,Oruchinga (refugee settlement),UGA,Isingiro,Bukanga,-0.94,30.76
+6412,Nakivale (refugee settlement),UGA,Isingiro,Bukanga,-0.78,30.96
+6413,Kyangwali (refugee settlement),UGA,Hoima,Buhaguzi,1.16,30.75
+6414,Rhino Camp (refugee settlement),UGA,Arua,Terego,3.17,31.31
+6415,Imvepi (refugee settlement),UGA,Arua,Terego,3.23,31.28
+6416,Adjumani (refugee settlement),UGA,Adjumani,Adjumani,3.34,31.78
+6768,Wakiso,UGA,Wakiso,Busiro,0.4,32.48
+6769,Mukono,UGA,Mukono,Mukono,0.36,32.75
+6770,Masaka,UGA,Masaka,Masaka Municipality,-0.35,31.74
+7854,Nabilatuk,UGA,Nakapiripirit,Pian,2.05,34.57
+7956,Napak,UGA,Napak,Bokora,2.22,34.26
+7957,Karenga,UGA,Kaabong,Dodoth,3.57,33.7
+8471,Kasonga,UGA,Hoima,Buhaguzi,1.19,30.78
+8472,Basecamp,UGA,Kamwenge,Kibale,0.33,30.67
+8473,Bukere,UGA,Kyegegwa,Kyaka,0.38,31.1
+8474,Byabakora,UGA,Kyegegwa,Kyaka,0.33,31.08
+8475,Kagoma,UGA,Hoima,Buhaguzi,1.15,30.75
+8476,Kajaho,UGA,Isingiro,Isingiro,-0.94,30.75
+8477,Kyempango,UGA,Kamwenge,Kibale,0.29,30.68
+8478,Mubende,UGA,Mubende,Buwekula,0.55,31.39
+8479,New Congo,UGA,Mbarara,Kashari,-0.52,30.74
+8480,Rubondo,UGA,Isingiro,Bukanga,-0.73,31.04
+8481,Sweswe,UGA,Kyegegwa,Kyaka,0.37,31.11
+8482,Maratatu B,UGA,Hoima,Buhaguzi,1.16,30.8
+8483,Kityaza,UGA,Isingiro,Bukanga,-0.81,30.97
+8484,Katalyeba,UGA,Kamwenge,Kibale,0.34,30.66
+8560,Morobi,UGA,Moyo,Obongi,3.43,31.58
+8561,Okubani,UGA,Yumbe,Aringa,3.23,31.42
+8562,Lodenga,UGA,Yumbe,Aringa,3.39,31.39
+8563,Ocodri,UGA,Arua,Terego,3.07,31.09
+8564,Ndirindiri,UGA,Moyo,Obongi,3.49,31.67
+8565,Ocea,UGA,Arua,Madi-okollo,3.08,31.28
+8566,Ofua3,UGA,Arua,Terego,3.13,31.16
+8567,Koboko,UGA,Koboko,Koboko,3.41,30.96
+8568,Pagilinya,UGA,Adjumani,Adjumani,3.38,32.02
+8569,Keri,UGA,Koboko,Koboko,3.51,30.94
+8570,Bweyale,UGA,Kiryandongo,Kibanda,1.95,32.14
+8571,Ogili,UGA,Lamwo,Lamwo,3.41,32.5
+8572,Lifori,UGA,Moyo,West Moyo,3.58,31.59
+8573,Lodonga,UGA,Yumbe,Aringa,3.41,31.11
+8574,Ayilo1,UGA,Adjumani,Adjumani,3.29,31.94
+8575,Kiryandongo,UGA,Kiryandongo,Kibanda,1.88,32.06
+8576,Swinga,UGA,Yumbe,Aringa,3.52,31.34
+8577,Maaji,UGA,Adjumani,Adjumani,3.22,31.65
+8578,Kigumba,UGA,Kiryandongo,Kibanda,1.81,32.01
+8579,Ayilo2,UGA,Adjumani,Adjumani,3.26,31.95
+8580,Nyumanzi,UGA,Adjumani,Adjumani,3.46,31.95
+8581,Kubala,UGA,Arua,Terego,3.26,31.06
+8582,Kitgum,UGA,Kitgum,Chua,3.3,32.88
+8717,Bidibidi Reception (Zone 1),UGA,Yumbe,Aringa,3.48,31.37
+8718,Awindiri,UGA,Adjumani,Adjumani,3.37,31.78
+8719,Bel-Maling,UGA,Moyo,Obongi,3.47,31.61
+8720,Point J,UGA,Arua,Terego,3.27,31.28
+8721,Reception,UGA,Lamwo,Lamwo,3.36,32.41
+8722,Moyo Main,UGA,Moyo,West Moyo,3.65,31.72
+8723,Jerusalem Main,UGA,Lamwo,Lamwo,3.35,32.45
+8724,Yumbe Main,UGA,Yumbe,Aringa,3.46,31.25
+8990,Kanawat Market,UGA,Kotido,Jie,2.99,34.09
+8991,Tokora Market,UGA,Nakapiripirit,Kadani,1.84,34.66
+8992,Lokitalaebu Market,UGA,Kotido,Jie,2.99,33.99
+8993,Kokoria Market,UGA,Kotido,Jie,3.1,33.93
+8994,Lolachat Market,UGA,Nakapiripirit,Kadani,1.94,34.56
+8995,Lorengedwat Market,UGA,Nakapiripirit,Pian,2.36,34.58
+8996,Naturum Namboole,UGA,Nakapiripirit,Kadani,1.87,34.58
+8997,Usake market,UGA,Kaabong,Dodoth,3.78,34.04

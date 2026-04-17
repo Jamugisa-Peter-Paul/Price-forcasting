@@ -1,0 +1,107 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{geometry}
+\geometry{margin=1in}
+\usepackage{titlesec}
+\usepackage{xcolor}
+\usepackage{mdframed}
+\usepackage{enumitem}
+
+\titleformat{\section}{\Large\bfseries\color{blue}}{\thesection}{1em}{}
+\titleformat{\subsection}{\large\bfseries\color{darkgray}}{\thesubsection}{1em}{}
+
+\title{\textbf{Market Price Forecasting for Ugandan Staple Crops} \\ \large Presentation Script \& Cheat Sheet}
+\author{Read-Aloud Guide for Non-Technical Presenters}
+\date{}
+
+\begin{document}
+\maketitle
+
+\begin{mdframed}[backgroundcolor=yellow!10, linecolor=gray]
+\textbf{PRESENTER NOTE:} This document is designed as a direct read-aloud script and cheat sheet. Even if you do not understand the underlying neural network mathematics, you can read the bolded sections confidently to explain the entire project from start to finish.
+\end{mdframed}
+
+\section{Introduction \& The Problem}
+
+\textbf{What you say:} 
+"Good morning, everyone. Our project tackles a critical issue in Uganda: food insecurity caused by volatile crop prices. Smallholder farmers and traders rely on selling maize, beans, and cassava. But when prices crash unexpectedly, livelihoods are ruined. Our goal was simple: Could we build an Artificial Intelligence model that looks at historical data and accurately predicts what the price of these crops will be 4 to 8 weeks in the future?"
+
+\textbf{Why it matters:} "Currently, monitoring systems only tell us what the price is \textit{today}. We want a tool that tells us what the price will be \textit{next month}, allowing NGOs to intervene before a crisis hits and helping farmers know exactly when to sell."
+
+\section{The Data Journey: How and Why}
+
+\textbf{What you say:} 
+"To make AI predict the future, it needs a lot of context from the past. We didn't just use one simple dataset; we merged three massive, distinct datasets to give our AI the full picture."
+
+\begin{itemize}[leftmargin=*]
+    \item \textbf{Dataset 1: WFP Food Prices.} "First, we downloaded historical market prices from the World Food Programme (WFP). We filtered this down to three exact target districts: Kampala, Gulu, and Mbale, and focused entirely on Maize, Beans, and Cassava flour."
+    \item \textbf{Dataset 2: CHIRPS Rainfall.} "Why rainfall? Because agriculture in Uganda is entirely rain-fed. A drought today means high prices tomorrow. We downloaded satellite rainfall data and mapped it to the specific regions of Kampala, Gulu, and Mbale."
+    \item \textbf{Dataset 3: World Bank Commodity Prices.} "Finally, local prices are affected by global shocks. We pulled global Crude Oil prices and global Maize prices from the World Bank. Why? Because high crude oil prices make truck transport more expensive, which drives up local food prices in markets!"
+\end{itemize}
+
+\section{Feature Engineering (Prepping the AI)}
+
+\textbf{What you say:} 
+"Raw data is messy. Before feeding it to the AI, we had to do something called \textbf{Feature Engineering}. Think of this as translating human raw data into 'AI language'. Here is exactly how we did it:"
+
+\begin{enumerate}
+    \item \textbf{Lag Features:} "We created 'lags'. This tells the AI what the price was 1 month ago, 2 months ago, and 4 months ago. This helps the AI understand momentum."
+    \item \textbf{Seasonal Indicators:} "We created mathematical indicators for the months of the year, including specific markers for Uganda's two main Harvest Seasons (Season A in June/July, Season B in Dec/Jan). Because crop prices always drop during harvest!"
+    \item \textbf{Handling Missing Data:} "Sometimes data was missing. To fix this, we used 'Linear Interpolation', simply drawing a straight mathematical line between existing data points to fill in the gaps without losing accuracy."
+\end{enumerate}
+
+\section{The Models: Good, Better, Best}
+
+\textbf{What you say:}
+"We didn't just build one model. We built three completely different models side-by-side so they could compete."
+
+\subsection{1. The Baseline: ARIMA}
+"First, we built an ARIMA model. This is old-school, classical statistics. It looks linearly at past trends. It did okay, but it struggles to understand sudden, massive shocks like a sudden lockdown or drought."
+
+\subsection{2. Facebook Prophet}
+"Next, we tried a modern tool built by Facebook called Prophet. Prophet is great at finding yearly seasonality. However, we found it sometimes over-exaggerated the impact of certain events, making it a bit unreliable for African agricultural markets."
+
+\subsection{3. The Winner: LSTM (Deep Learning Neural Network)}
+"Finally, we built our powerhouse: an LSTM. LSTM stands for Long Short-Term Memory. This is a Deep Learning Neural Network that literally mimics human brain architecture. It looks at 'windows' of data—examining 6 months of price, rainfall, and oil data simultaneously—to predict the 7th month. It absolutely crushed the competition."
+
+\section{Results: How Did We Do?}
+
+\textbf{What you say:}
+"When we evaluated these models on data they had never seen before, we looked at the MAPE—the Mean Absolute Percentage Error. The lower the MAPE, the better."
+
+\begin{itemize}
+    \item \textbf{Prophet} had an average error of about 29\%.
+    \item \textbf{ARIMA} had an average error of about 25\%.
+    \item \textbf{LSTM achieved an incredible average error of just 17\%!} 
+\end{itemize}
+
+"In some districts, like Mbale and Gulu, the LSTM predicted future prices with an error rate as low as 11\%. This proves that Neural Networks paired with climate data can fundamentally outsmart traditional forecasting."
+
+\section{The Streamlit Deployment (Live Demo)}
+
+\textbf{PRESENTER NOTE:} During this section, open the Streamlit Web App on your laptop.
+
+\textbf{What you say:}
+"An AI model sitting in a student notebook doesn't help a farmer. We went a step further and 'Deployed' our LSTM into a live, interactive web dashboard using a framework called Streamlit."
+
+"As you can see on the screen... 
+We have a beautiful interface. I can use this dropdown to select 'Kampala' and 'Maize'. 
+In the background, what you are watching is our Deep Learning Neural Network actually training itself live on the fly—it takes about 3 seconds—and then it generates this interactive graph showing historical reality versus future predicted trajectory!"
+
+\section{Challenges Faced \& Overcome}
+
+\textbf{What you say:}
+"This project was not easy. Here are the three massive challenges we faced, and exactly how we beat them:"
+
+\begin{enumerate}
+    \item \textbf{Mismatched Geographical Data:} "The WFP market data used text District names (e.g., 'Gulu'), but the Satellite Rainfall used obscure P-Codes like 'UG1' for wider regions. We had to manually build mapping dictionaries to align the skies with the markets."
+    \item \textbf{Data Sparsity (Not enough data!):} "Neural networks usually need tens of thousands of rows of data. After aggregating to monthly prices, we only had about 200 rows per crop! If we weren't careful, the AI would 'overfit'—meaning it just memorizes the data instead of learning. How did we solve it? We implemented \textbf{Dropout Layers} in our code: this randomly literally turns off 20\% of the neural pathways during training, forcing the AI to learn real generalized patterns instead of just memorizing the test answers!"
+    \item \textbf{Frequency Mismatches:} "Rainfall came in dekads (10-day periods). World Bank data came strictly monthly. WFP came sporadically. We solved this by forcing everything into a strict Month-Start (MS) uniform frequency using Pandas resampling."
+\end{enumerate}
+
+\section{Conclusion}
+
+\textbf{What you say:}
+"In conclusion, we successfully built an end-to-end Machine Learning pipeline. We gathered disjointed global and local datasets, aligned them mathematically, built a sliding-window neural network, and deployed it to the web. The 17\% error rate proves that multi-variable Deep Learning has a massive future in African predictive agriculture. Thank you."
+
+\end{document}
