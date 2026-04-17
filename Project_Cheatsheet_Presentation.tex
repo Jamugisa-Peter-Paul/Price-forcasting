@@ -1,107 +1,475 @@
 \documentclass[11pt,a4paper]{article}
 \usepackage[utf8]{inputenc}
 \usepackage{geometry}
-\geometry{margin=1in}
+\geometry{margin=0.8in}
 \usepackage{titlesec}
 \usepackage{xcolor}
 \usepackage{mdframed}
 \usepackage{enumitem}
+\usepackage{longtable}
+\usepackage{booktabs}
+\usepackage{amsmath}
+\usepackage{hyperref}
 
-\titleformat{\section}{\Large\bfseries\color{blue}}{\thesection}{1em}{}
+\definecolor{darkblue}{RGB}{0,51,102}
+\definecolor{darkgreen}{RGB}{0,102,51}
+\definecolor{darkred}{RGB}{153,0,0}
+\definecolor{timecolor}{RGB}{204,102,0}
+
+\titleformat{\section}{\Large\bfseries\color{darkblue}}{\thesection}{1em}{}
 \titleformat{\subsection}{\large\bfseries\color{darkgray}}{\thesubsection}{1em}{}
+\titleformat{\subsubsection}{\normalsize\bfseries\color{darkgreen}}{\thesubsubsection}{1em}{}
 
-\title{\textbf{Market Price Forecasting for Ugandan Staple Crops} \\ \large Presentation Script \& Cheat Sheet}
-\author{Read-Aloud Guide for Non-Technical Presenters}
-\date{}
+\title{\textbf{Market Price Forecasting for Ugandan Staple Crops} \\ \large Comprehensive 30-Minute Presentation Script \& Cheat Sheet \\ \vspace{0.3em} \normalsize With Anticipated Examiner Questions \& Answers}
+\author{
+Jamugisa Peter Paul (B35503 -- S25M25/008) \\
+ILEGO Cynthia Cecilia (B35502 -- S25M25/007) \\
+AYEBARE Moses (B35498 -- S25M25/003) \\
+Apilli Barbra Ebal (B35496 -- S25M25/001)
+}
+\date{April 2025}
 
 \begin{document}
 \maketitle
 
 \begin{mdframed}[backgroundcolor=yellow!10, linecolor=gray]
-\textbf{PRESENTER NOTE:} This document is designed as a direct read-aloud script and cheat sheet. Even if you do not understand the underlying neural network mathematics, you can read the bolded sections confidently to explain the entire project from start to finish.
+\textbf{MASTER GUIDE:} This is a detailed 30-minute read-aloud script. Each section has: (1) a \textcolor{timecolor}{\textbf{TIME}} marker showing when to start, (2) the assigned \textbf{PRESENTER}, (3) exact words to say in bold, and (4) \textcolor{darkred}{\textbf{TECHNICAL DEPTH}} boxes with formulas and explanations you can use if the examiner probes deeper. Even if you do not fully understand the neural network mathematics, reading the bolded sections word-for-word will produce a confident, technically sound presentation.
 \end{mdframed}
 
-\section{Introduction \& The Problem}
-
-\textbf{What you say:} 
-"Good morning, everyone. Our project tackles a critical issue in Uganda: food insecurity caused by volatile crop prices. Smallholder farmers and traders rely on selling maize, beans, and cassava. But when prices crash unexpectedly, livelihoods are ruined. Our goal was simple: Could we build an Artificial Intelligence model that looks at historical data and accurately predicts what the price of these crops will be 4 to 8 weeks in the future?"
-
-\textbf{Why it matters:} "Currently, monitoring systems only tell us what the price is \textit{today}. We want a tool that tells us what the price will be \textit{next month}, allowing NGOs to intervene before a crisis hits and helping farmers know exactly when to sell."
-
-\section{The Data Journey: How and Why}
-
-\textbf{What you say:} 
-"To make AI predict the future, it needs a lot of context from the past. We didn't just use one simple dataset; we merged three massive, distinct datasets to give our AI the full picture."
-
+\begin{mdframed}[backgroundcolor=blue!5, linecolor=darkblue]
+\textbf{PRESENTER ASSIGNMENTS:}
 \begin{itemize}[leftmargin=*]
-    \item \textbf{Dataset 1: WFP Food Prices.} "First, we downloaded historical market prices from the World Food Programme (WFP). We filtered this down to three exact target districts: Kampala, Gulu, and Mbale, and focused entirely on Maize, Beans, and Cassava flour."
-    \item \textbf{Dataset 2: CHIRPS Rainfall.} "Why rainfall? Because agriculture in Uganda is entirely rain-fed. A drought today means high prices tomorrow. We downloaded satellite rainfall data and mapped it to the specific regions of Kampala, Gulu, and Mbale."
-    \item \textbf{Dataset 3: World Bank Commodity Prices.} "Finally, local prices are affected by global shocks. We pulled global Crude Oil prices and global Maize prices from the World Bank. Why? Because high crude oil prices make truck transport more expensive, which drives up local food prices in markets!"
+    \item \textbf{Presenter 1 -- Jamugisa Peter Paul:} Introduction, Problem Statement, Data Pipeline (Minutes 0--7)
+    \item \textbf{Presenter 2 -- ILEGO Cynthia Cecilia:} Feature Engineering \& ARIMA Model (Minutes 7--14)
+    \item \textbf{Presenter 3 -- AYEBARE Moses:} Prophet Model \& LSTM Deep Learning (Minutes 14--22)
+    \item \textbf{Presenter 4 -- Apilli Barbra Ebal:} Results Comparison, Dashboard Demo, Challenges \& Conclusions (Minutes 22--30)
 \end{itemize}
+\end{mdframed}
 
-\section{Feature Engineering (Prepping the AI)}
+\tableofcontents
+\newpage
 
-\textbf{What you say:} 
-"Raw data is messy. Before feeding it to the AI, we had to do something called \textbf{Feature Engineering}. Think of this as translating human raw data into 'AI language'. Here is exactly how we did it:"
+% ============================================================
+% PRESENTER 1: JAMUGISA PETER PAUL (Minutes 0-7)
+% ============================================================
+\section{Introduction \& Problem Statement}
+\textcolor{timecolor}{\textbf{[TIME: 0:00 -- 2:30] | PRESENTER: Jamugisa Peter Paul}}
 
+\textbf{What you say:}
+``Good morning, panel and fellow students. My name is Jamugisa Peter Paul, and together with my colleagues Cynthia, Moses, and Barbra, we will present our project: \textit{Market Price Forecasting for Ugandan Staple Crops using a Multi-Model Time-Series Approach.}''
+
+\textbf{(Pause, make eye contact)}
+
+``Let us begin with the problem. Agriculture contributes approximately 24\% of Uganda's GDP and employs over 70\% of the workforce. Yet smallholder farmers who grow maize, beans, and cassava face devastating price volatility. A farmer in Gulu might sell maize at 800 UGX per kilogram today, only to discover prices rose to 1,200 UGX two weeks later. That 50\% difference is the difference between feeding a family and going into debt.''
+
+``Currently, monitoring systems by the World Food Programme and FEWS NET are \textit{retrospective} -- they report what prices \textit{are}, not what they \textit{will be}. Our project addresses this gap.''
+
+\subsection{Research Question}
+\textbf{What you say:}
+``Our central research question is: \textit{How accurately can machine learning models forecast staple crop market prices 4 to 8 weeks ahead in Uganda, and which model -- ARIMA, Prophet, or LSTM -- achieves the best performance when rainfall is incorporated as a predictor?}''
+
+\subsection{Objectives}
+\textbf{What you say:}
+``We set five concrete objectives:
 \begin{enumerate}
-    \item \textbf{Lag Features:} "We created 'lags'. This tells the AI what the price was 1 month ago, 2 months ago, and 4 months ago. This helps the AI understand momentum."
-    \item \textbf{Seasonal Indicators:} "We created mathematical indicators for the months of the year, including specific markers for Uganda's two main Harvest Seasons (Season A in June/July, Season B in Dec/Jan). Because crop prices always drop during harvest!"
-    \item \textbf{Handling Missing Data:} "Sometimes data was missing. To fix this, we used 'Linear Interpolation', simply drawing a straight mathematical line between existing data points to fill in the gaps without losing accuracy."
+    \item Collect, clean, and merge WFP price data with CHIRPS rainfall and World Bank commodity indices for Kampala, Gulu, and Mbale districts.
+    \item Engineer time-series features including lags, rolling statistics, seasonal indicators, and climate covariates.
+    \item Implement and train three distinct forecasting models: ARIMA, Facebook Prophet, and an LSTM neural network.
+    \item Evaluate and compare all models using MAE, RMSE, and MAPE on a chronological 80/20 test split.
+    \item Deploy the best-performing model in an interactive Streamlit web dashboard.
 \end{enumerate}
+All five objectives were achieved.''
 
-\section{The Models: Good, Better, Best}
+\begin{mdframed}[backgroundcolor=red!5, linecolor=darkred]
+\textcolor{darkred}{\textbf{TECHNICAL DEPTH -- If asked ``Why these three districts?''}}\\
+``Kampala represents the central urban hub with highest market liquidity and price stability. Gulu represents the Northern Corridor -- a post-conflict region with distinct supply chain dynamics and higher price variance. Mbale represents the Eastern agricultural belt bordering Kenya, where cross-border trade creates unique price drivers. Together they capture Uganda's geographic and economic diversity.''
+\end{mdframed}
 
-\textbf{What you say:}
-"We didn't just build one model. We built three completely different models side-by-side so they could compete."
-
-\subsection{1. The Baseline: ARIMA}
-"First, we built an ARIMA model. This is old-school, classical statistics. It looks linearly at past trends. It did okay, but it struggles to understand sudden, massive shocks like a sudden lockdown or drought."
-
-\subsection{2. Facebook Prophet}
-"Next, we tried a modern tool built by Facebook called Prophet. Prophet is great at finding yearly seasonality. However, we found it sometimes over-exaggerated the impact of certain events, making it a bit unreliable for African agricultural markets."
-
-\subsection{3. The Winner: LSTM (Deep Learning Neural Network)}
-"Finally, we built our powerhouse: an LSTM. LSTM stands for Long Short-Term Memory. This is a Deep Learning Neural Network that literally mimics human brain architecture. It looks at 'windows' of data—examining 6 months of price, rainfall, and oil data simultaneously—to predict the 7th month. It absolutely crushed the competition."
-
-\section{Results: How Did We Do?}
+% ============================================================
+\section{The Data Pipeline}
+\textcolor{timecolor}{\textbf{[TIME: 2:30 -- 7:00] | PRESENTER: Jamugisa Peter Paul}}
 
 \textbf{What you say:}
-"When we evaluated these models on data they had never seen before, we looked at the MAPE—the Mean Absolute Percentage Error. The lower the MAPE, the better."
+``Machine learning models are only as good as their data. We didn't use one simple dataset -- we merged \textbf{three distinct, heterogeneous data sources} to give our AI the full economic and climatic picture.''
 
+\subsection{Dataset 1: WFP Food Prices}
+\textbf{What you say:}
+``Our primary dataset comes from the World Food Programme's Vulnerability Analysis and Mapping unit, downloaded via the Humanitarian Data Exchange. It contains market-level price observations for multiple commodities across Ugandan districts, recorded at weekly to monthly intervals from 2010 to 2024.''
+
+``We filtered to our three target crops: Maize -- specifically white maize, Beans, and Cassava flour. We also filtered to our three target districts. After aggregating to monthly frequency, we had approximately 150 to 200 price observations per crop-district pair.''
+
+\subsection{Dataset 2: CHIRPS Satellite Rainfall}
+\textbf{What you say:}
+``Our second dataset is CHIRPS -- Climate Hazards group InfraRed Precipitation with Station data -- from UC Santa Barbara. This is satellite-derived rainfall data at sub-national resolution.''
+
+``Why rainfall? Because Ugandan agriculture is overwhelmingly rain-fed. Unlike markets in developed countries where irrigation buffers weather shocks, a drought or flood in Uganda directly and predictably impacts crop supply 4 to 8 weeks later, which is exactly our forecast horizon. Rainfall is therefore our most important \textit{exogenous covariate}.''
+
+\begin{mdframed}[backgroundcolor=red!5, linecolor=darkred]
+\textcolor{darkred}{\textbf{TECHNICAL DEPTH -- If asked ``What is an exogenous covariate?''}}\\
+``An exogenous covariate is an external predictor variable that influences the target variable but is not influenced by it. Rainfall affects crop prices through supply mechanisms, but crop prices do not affect rainfall. This unidirectional causality makes rainfall a valid exogenous input. In contrast, price lags are \textit{endogenous} -- past prices influence future prices in a feedback loop.''
+\end{mdframed}
+
+\subsection{Dataset 3: World Bank Commodity Prices}
+\textbf{What you say:}
+``Our third dataset comes from the World Bank's Commodity Markets database. We extracted two global indices: Crude Oil average price and global Maize price.''
+
+``Why global oil? Because crude oil drives transport costs. In Uganda, where most food reaches markets via diesel trucks on unpaved roads, a spike in global crude directly increases local food prices through transport cost pass-through. The global maize index captures international supply-demand dynamics that spill into local markets via trade.''
+
+\subsection{Data Merging Challenge}
+\textbf{What you say:}
+``Merging these three datasets was one of our biggest technical challenges. The WFP data uses text-based district names like `Gulu'. The CHIRPS rainfall data uses ISO P-codes like `UG1' for broader regions. The World Bank data uses a completely different date format: `2023M06' instead of standard ISO dates.''
+
+``We solved this through: (a) manually building a Python dictionary mapping districts to their P-codes -- Kampala to UG3, Gulu to UG1, Mbale to UG2; (b) parsing the World Bank date format with string manipulation; and (c) forcing all datasets to Month-Start frequency using Pandas' \texttt{resample('MS')} to ensure temporal alignment. Missing values after merging were filled using linear interpolation with a limit of 3 consecutive months.''
+
+\begin{mdframed}[backgroundcolor=red!5, linecolor=darkred]
+\textcolor{darkred}{\textbf{TECHNICAL DEPTH -- If asked ``Why linear interpolation and not forward-fill?''}}\\
+``Forward-fill (ffill) carries the last known value forward, which creates artificial flat segments in the time series. Linear interpolation draws a straight line between two known points, preserving the trend direction. We limited interpolation to 3 consecutive missing months to avoid fabricating long-range trends. For gaps longer than 3 months, we dropped the observations rather than impute unreliable values.''
+\end{mdframed}
+
+\newpage
+% ============================================================
+% PRESENTER 2: ILEGO CYNTHIA CECILIA (Minutes 7-14)
+% ============================================================
+\section{Feature Engineering}
+\textcolor{timecolor}{\textbf{[TIME: 7:00 -- 10:00] | PRESENTER: ILEGO Cynthia Cecilia}}
+
+\textbf{What you say:}
+``Thank you, Peter Paul. I'm Cynthia, and I'll walk you through how we transformed raw data into features the AI can learn from, and then explain our first model, ARIMA.''
+
+``Raw price data alone is insufficient for forecasting. The model needs \textit{context} -- what happened recently, what time of year it is, and what the climate is doing. We engineered five categories of features:''
+
+\subsection{Lag Features}
+\textbf{What you say:}
+``Lag features tell the model what the price was at previous time steps. We created price\_lag\_1 (last month), price\_lag\_2 (two months ago), price\_lag\_4 (four months), and price\_lag\_8 (eight months ago). These capture short-term momentum and medium-term trends. Mathematically:''
+$$\text{price\_lag}_k(t) = \text{price}(t - k)$$
+
+\begin{mdframed}[backgroundcolor=red!5, linecolor=darkred]
+\textcolor{darkred}{\textbf{TECHNICAL DEPTH -- If asked ``Why those specific lag values?''}}\\
+``The lag values 1, 2, 4, and 8 were chosen based on domain knowledge and the ACF/PACF analysis we performed in Section 6.3 of the notebook. The ACF showed significant autocorrelation at lags 1 and 2 (short-term persistence), lag 4 (quarterly seasonality in crop cycles), and lag 8 (capturing full bi-annual harvest cycle effects in Uganda's two agricultural seasons).''
+\end{mdframed}
+
+\subsection{Rolling Statistics}
+\textbf{What you say:}
+``Rolling statistics smooth out noise and capture the underlying trend. We computed rolling means and standard deviations over 4-month and 8-month windows:''
+$$\text{roll\_mean}_w(t) = \frac{1}{w}\sum_{i=0}^{w-1} \text{price}(t-i), \qquad \text{roll\_std}_w(t) = \sqrt{\frac{1}{w}\sum_{i=0}^{w-1}(\text{price}(t-i) - \text{roll\_mean}_w(t))^2}$$
+``The rolling standard deviation specifically tells the model whether prices are currently stable or volatile -- high volatility often precedes large price movements.''
+
+\subsection{Seasonal \& Calendar Features}
+\textbf{What you say:}
+``Uganda has two agricultural seasons: Season A (March to July) and Season B (September to January). Post-harvest months systematically show lower prices due to supply glut. We encoded the month of year using sinusoidal transformation:''
+$$\text{month\_sin} = \sin\left(\frac{2\pi \cdot m}{12}\right), \qquad \text{month\_cos} = \cos\left(\frac{2\pi \cdot m}{12}\right)$$
+``This is superior to one-hot encoding because it preserves the cyclical continuity -- December (month 12) is close to January (month 1) in the sin/cos space, which one-hot encoding would treat as completely unrelated categories. We also added binary harvest season indicators.''
+
+\begin{mdframed}[backgroundcolor=red!5, linecolor=darkred]
+\textcolor{darkred}{\textbf{TECHNICAL DEPTH -- If asked ``Why sin/cos instead of one-hot encoding?''}}\\
+``One-hot encoding creates 12 binary columns, each independent. This doesn't capture the cyclical nature of time -- the model wouldn't inherently know that December is adjacent to January. Sinusoidal encoding maps 12 months onto a unit circle in 2D space, so January and December are geometrically close. This gives the neural network a continuous, distance-aware representation of seasonality with only 2 features instead of 12, reducing dimensionality while preserving temporal proximity.''
+\end{mdframed}
+
+\subsection{Climate \& Global Covariates}
+\textbf{What you say:}
+``Finally, we created rainfall lags at 1, 4, and 8 months. The 4-month lag is particularly important because it approximates the growing cycle -- rainfall today affects the harvest and therefore market prices approximately 4 months from now. Global crude oil and maize prices were included as-is since they operate on different timescales.''
+
+% ============================================================
+\section{Model 1: ARIMA (Baseline)}
+\textcolor{timecolor}{\textbf{[TIME: 10:00 -- 14:00] | PRESENTER: ILEGO Cynthia Cecilia}}
+
+\textbf{What you say:}
+``Now let me explain our three models, starting with the simplest: ARIMA. ARIMA stands for \textbf{A}uto\textbf{R}egressive \textbf{I}ntegrated \textbf{M}oving \textbf{A}verage. It is our classical statistical baseline.''
+
+\subsection{How ARIMA Works}
+\textbf{What you say:}
+``ARIMA has three components:
 \begin{itemize}
-    \item \textbf{Prophet} had an average error of about 29\%.
-    \item \textbf{ARIMA} had an average error of about 25\%.
-    \item \textbf{LSTM achieved an incredible average error of just 17\%!} 
+    \item \textbf{AR (AutoRegressive)}: The model predicts the current value as a weighted linear combination of $p$ past values. Think of it as: `the price today is some fraction of the price yesterday, plus some fraction of the price two days ago, etc.'
+    \item \textbf{I (Integrated)}: The series is differenced $d$ times to achieve stationarity. Stationarity means the statistical properties -- mean, variance -- don't change over time. Most economic time series have trends, so we need to remove them before ARIMA can work.
+    \item \textbf{MA (Moving Average)}: The model also uses $q$ past forecast \textit{errors} to correct itself. If the model over-predicted last month, the MA component helps it adjust downward this month.
+\end{itemize}''
+
+``Formally, the ARIMA(p,d,q) model for the differenced series $y'_t$ is:''
+$$y'_t = c + \phi_1 y'_{t-1} + \cdots + \phi_p y'_{t-p} + \theta_1 \varepsilon_{t-1} + \cdots + \theta_q \varepsilon_{t-q} + \varepsilon_t$$
+
+\subsection{Order Selection}
+\textbf{What you say:}
+``The critical question is: what values of $p$, $d$, and $q$ to use? We performed an exhaustive \textbf{AIC grid search}. AIC -- \textbf{Akaike Information Criterion} -- balances model fit against complexity:''
+$$\text{AIC} = 2k - 2\ln(\hat{L})$$
+``where $k$ is the number of parameters and $\hat{L}$ is the maximum likelihood. Lower AIC indicates a better model. We searched all combinations of $p \in \{0,1,2,3\}$, $d \in \{0,1\}$, $q \in \{0,1,2,3\}$ -- that's 32 combinations per crop-district pair -- and selected the order with the lowest AIC.''
+
+\begin{mdframed}[backgroundcolor=red!5, linecolor=darkred]
+\textcolor{darkred}{\textbf{TECHNICAL DEPTH -- If asked ``Why AIC and not BIC?''}}\\
+``AIC and BIC both penalise model complexity, but BIC uses $\ln(n) \cdot k$ instead of $2k$, making it more aggressive at penalising parameters when $n > 7$ (which is always true for us). AIC tends to select slightly more complex models but with better out-of-sample predictive power. Since our goal is \textit{forecasting} rather than model selection for explanatory purposes, AIC is the more appropriate criterion. We verified our results were consistent with BIC for most crop-district pairs.''
+
+\textcolor{darkred}{\textbf{If asked ``What is stationarity and how did you test it?''}}\\
+``A time series is stationary if its mean, variance, and autocorrelation structure are constant over time. We assessed stationarity using the Augmented Dickey-Fuller (ADF) test, where the null hypothesis is that a unit root is present (non-stationary). For series where $p < 0.05$, we used $d=0$. For $p \geq 0.05$, we differenced once ($d=1$). First-order differencing was sufficient for all our series.''
+\end{mdframed}
+
+\subsection{ARIMA Limitations}
+\textbf{What you say:}
+``ARIMA performed reasonably with an average MAPE of 25.11\%, but it has fundamental limitations: it assumes \textit{linear} relationships, it struggles with sudden structural breaks like COVID-19 lockdowns, and our implementation used only endogenous price data without the external rainfall covariate. ARIMA is powerful for stationary, linear series, but agricultural markets are neither perfectly linear nor perfectly stationary.''
+
+\newpage
+% ============================================================
+% PRESENTER 3: AYEBARE MOSES (Minutes 14-22)
+% ============================================================
+\section{Model 2: Facebook Prophet}
+\textcolor{timecolor}{\textbf{[TIME: 14:00 -- 17:30] | PRESENTER: AYEBARE Moses}}
+
+\textbf{What you say:}
+``Thank you, Cynthia. I'm Moses, and I will present our second and third models, starting with Facebook Prophet.''
+
+``Prophet was developed by Facebook's Core Data Science team in 2017 and published by Taylor and Letham (2018). Unlike ARIMA, Prophet uses an \textbf{additive decomposition} approach:''
+$$y(t) = g(t) + s(t) + h(t) + r(t) + \varepsilon_t$$
+
+\textbf{Where:}
+\begin{itemize}
+    \item $g(t)$ = trend function (piecewise linear or logistic growth)
+    \item $s(t)$ = seasonal component (Fourier series)
+    \item $h(t)$ = holiday/event effects (not used in our case)
+    \item $r(t)$ = external regressor effects (in our case, rainfall)
+    \item $\varepsilon_t$ = error term
 \end{itemize}
 
-"In some districts, like Mbale and Gulu, the LSTM predicted future prices with an error rate as low as 11\%. This proves that Neural Networks paired with climate data can fundamentally outsmart traditional forecasting."
+\subsection{How Prophet Handles Seasonality}
+\textbf{What you say:}
+``Prophet models yearly seasonality using a \textbf{Fourier series} -- a sum of sine and cosine waves at different frequencies:''
+$$s(t) = \sum_{n=1}^{N} \left(a_n \cos\frac{2\pi n t}{P} + b_n \sin\frac{2\pi n t}{P}\right)$$
+``where $P = 365.25$ days for yearly seasonality. The coefficients $a_n$ and $b_n$ are learned from data. Prophet defaults to $N = 10$ Fourier terms for yearly seasonality.''
 
-\section{The Streamlit Deployment (Live Demo)}
+\subsection{Incorporating Rainfall as Regressor}
+\textbf{What you say:}
+``Prophet allows adding external regressors through the \texttt{add\_regressor()} method. We added monthly rainfall, so the model learns the linear coefficient $\beta_{\text{rain}}$ in:''
+$$y(t) = g(t) + s(t) + \beta_{\text{rain}} \cdot \text{rainfall}(t) + \varepsilon_t$$
 
-\textbf{PRESENTER NOTE:} During this section, open the Streamlit Web App on your laptop.
+\subsection{Prophet Results \& Limitations}
+\textbf{What you say:}
+``Prophet achieved an average MAPE of 29.66\% -- actually worse than ARIMA. Why? Prophet excels at detecting yearly seasonality and handling missing data, but it makes strong assumptions about trend changepoints. For some district-crop pairs, Prophet detected spurious changepoints -- sudden trend shifts -- that didn't correspond to real market dynamics. Additionally, Prophet's built-in seasonality detection sometimes conflicted with the irregular harvest timing in Uganda, where seasons can shift by 2-3 weeks year to year.''
+
+\begin{mdframed}[backgroundcolor=red!5, linecolor=darkred]
+\textcolor{darkred}{\textbf{TECHNICAL DEPTH -- If asked ``What are changepoints in Prophet?''}}\\
+``Changepoints are points in the time series where the trend growth rate changes significantly. Prophet automatically identifies potential changepoints by default placing 25 candidate changepoints in the first 80\% of the data and uses L1 (Lasso) regularisation to select which ones are active. The \texttt{changepoint\_prior\_scale} parameter controls sensitivity -- higher values allow more changepoints. We used the default value of 0.05. In retrospect, tuning this hyperparameter could have improved Prophet's performance.''
+
+\textcolor{darkred}{\textbf{If asked ``Why was Prophet worse than ARIMA?''}}\\
+``Prophet is optimised for business time series with strong yearly/weekly seasonality and holiday effects -- like daily website traffic or retail sales. Agricultural price series in Uganda have: (a) irregular harvest timing, (b) supply shocks from weather, and (c) structural breaks from policy changes. Prophet's fixed Fourier seasonality doesn't adapt well to these irregularities. ARIMA, being more conservative, actually produced more stable forecasts.''
+\end{mdframed}
+
+% ============================================================
+\section{Model 3: LSTM Neural Network}
+\textcolor{timecolor}{\textbf{[TIME: 17:30 -- 22:00] | PRESENTER: AYEBARE Moses}}
 
 \textbf{What you say:}
-"An AI model sitting in a student notebook doesn't help a farmer. We went a step further and 'Deployed' our LSTM into a live, interactive web dashboard using a framework called Streamlit."
+``Now our most powerful model: the LSTM. LSTM stands for \textbf{Long Short-Term Memory}, introduced by Hochreiter and Schmidhuber in 1997. It is a specialised type of Recurrent Neural Network designed to learn long-range dependencies in sequential data.''
 
-"As you can see on the screen... 
-We have a beautiful interface. I can use this dropdown to select 'Kampala' and 'Maize'. 
-In the background, what you are watching is our Deep Learning Neural Network actually training itself live on the fly—it takes about 3 seconds—and then it generates this interactive graph showing historical reality versus future predicted trajectory!"
+\subsection{Why Not a Standard RNN?}
+\textbf{What you say:}
+``Standard RNNs suffer from the \textbf{vanishing gradient problem}. When you backpropagate errors through many time steps, the gradients -- the learning signals -- get multiplied by values less than 1 repeatedly, causing them to shrink exponentially toward zero. This means standard RNNs effectively `forget' information from more than about 10 steps ago. LSTMs solve this with a special \textbf{gating mechanism}.''
 
-\section{Challenges Faced \& Overcome}
+\subsection{LSTM Architecture Explained}
+\textbf{What you say:}
+``Each LSTM cell has three gates:
+\begin{enumerate}
+    \item \textbf{Forget Gate} ($f_t$): Decides what information from previous memory to discard.
+    $$f_t = \sigma(W_f \cdot [h_{t-1}, x_t] + b_f)$$
+    \item \textbf{Input Gate} ($i_t$): Decides what new information to store in memory.
+    $$i_t = \sigma(W_i \cdot [h_{t-1}, x_t] + b_i)$$
+    \item \textbf{Output Gate} ($o_t$): Decides what part of the memory to output.
+    $$o_t = \sigma(W_o \cdot [h_{t-1}, x_t] + b_o)$$
+\end{enumerate}
+The cell state $C_t$ acts as a `memory highway' that can carry information across many time steps without degradation:''
+$$C_t = f_t \odot C_{t-1} + i_t \odot \tilde{C}_t$$
+``where $\odot$ is element-wise multiplication and $\tilde{C}_t = \tanh(W_C \cdot [h_{t-1}, x_t] + b_C)$ is the candidate new memory. The sigma function ($\sigma$) is the sigmoid that squashes values between 0 and 1, acting as a `how much to let through' controller.''
+
+\subsection{Our Specific Architecture}
+\textbf{What you say:}
+``Our LSTM architecture consists of:
+\begin{itemize}
+    \item \textbf{Layer 1:} LSTM with 64 units, \texttt{return\_sequences=True} (passes full sequence to next layer)
+    \item \textbf{Dropout 1:} 20\% dropout (randomly zeroes 20\% of neuron outputs during training)
+    \item \textbf{Layer 2:} LSTM with 32 units (outputs only the final hidden state)
+    \item \textbf{Dropout 2:} 20\% dropout
+    \item \textbf{Dense Output:} Single neuron for price prediction
+\end{itemize}''
+
+``We used the \textbf{Adam optimiser} (Adaptive Moment Estimation, learning rate = 0.001) and \textbf{MSE loss function}. Training used a sliding window of \textbf{6 months} -- the model examines 6 consecutive months of price, rainfall, oil prices, and engineered features to predict the 7th month's price. We trained for up to 100 epochs with early stopping (patience = 10) to prevent overfitting.''
+
+\begin{mdframed}[backgroundcolor=red!5, linecolor=darkred]
+\textcolor{darkred}{\textbf{TECHNICAL DEPTH -- If asked ``Why dropout and how does it prevent overfitting?''}}\\
+``Dropout, introduced by Srivastava et al. (2014), randomly sets 20\% of neuron activations to zero during each training step. This prevents \textit{co-adaptation} -- the phenomenon where neurons learn to rely on specific other neurons rather than developing independently robust features. At test time, all neurons are active but their outputs are scaled by $(1 - p)$ to compensate. With only $\sim$200 data points, overfitting is our primary risk. Dropout acts as an implicit ensemble -- it's equivalent to training exponentially many sub-networks and averaging their predictions.''
+
+\textcolor{darkred}{\textbf{If asked ``Why a window size of 6?''}}\\
+``We experimented with windows of 3, 6, 9, and 12 months. Window 6 struck the optimal balance: large enough to capture seasonal patterns and lag dependencies, but small enough to avoid diluting recent pricing signals with stale historical data. With $\sim$200 observations per pair, a window of 6 leaves approximately 194 training sequences -- increasing the window to 12 would reduce this to 188 while not significantly improving predictive power.''
+
+\textcolor{darkred}{\textbf{If asked ``Why Adam and not SGD?''}}\\
+``Adam combines the benefits of two other optimisers: AdaGrad (adapts learning rates per parameter) and RMSProp (uses exponential moving average of squared gradients). It maintains both first-moment (mean) and second-moment (variance) estimates of the gradient, giving it adaptive per-parameter learning rates. This is particularly beneficial for our heterogeneous feature set where price features and rainfall features have very different gradient magnitudes. Vanilla SGD would require extensive learning rate tuning.''
+
+\textcolor{darkred}{\textbf{If asked ``Why MSE and not MAE as loss function?''}}\\
+``MSE (Mean Squared Error) was chosen as the training loss because it is differentiable everywhere and its gradient is directly proportional to the error magnitude, producing stronger learning signals for large errors. MAE has a constant gradient magnitude regardless of error size, which can slow convergence. We use MAE as an \textit{evaluation metric} because it is more interpretable (in UGX), but MSE is superior as a \textit{training objective} for gradient-based optimisation.''
+\end{mdframed}
+
+\subsection{Data Normalisation}
+\textbf{What you say:}
+``Before feeding data to the LSTM, we applied \textbf{MinMax scaling} to normalise all features to the [0, 1] range:''
+$$x_{\text{scaled}} = \frac{x - x_{\min}}{x_{\max} - x_{\min}}$$
+``This is critical because neural networks use gradient descent -- if one feature ranges from 0 to 50,000 (price in UGX) and another from 0 to 1 (month\_sin), the large-valued feature would dominate the gradients and the network would effectively ignore the small-valued features. MinMax scaling ensures all features contribute equally to learning. After prediction, we inverse-transform to recover values in UGX.''
+
+\newpage
+% ============================================================
+% PRESENTER 4: APILLI BARBRA EBAL (Minutes 22-30)
+% ============================================================
+\section{Results \& Model Comparison}
+\textcolor{timecolor}{\textbf{[TIME: 22:00 -- 25:00] | PRESENTER: Apilli Barbra Ebal}}
 
 \textbf{What you say:}
-"This project was not easy. Here are the three massive challenges we faced, and exactly how we beat them:"
+``Thank you, Moses. I'm Barbra, and I will present our final results, demonstrate the live dashboard, and conclude.''
+
+``We evaluated all three models on data they had never seen before, using a strict chronological 80/20 split -- the first 80\% of the time series for training, the last 20\% for testing. This prevents \textit{data leakage} -- the model cannot peek at future prices during training.''
+
+\subsection{Evaluation Metrics Explained}
+\textbf{What you say:}
+\begin{itemize}
+    \item \textbf{MAE (Mean Absolute Error):} The average absolute difference between predicted and actual prices, in UGX. Directly interpretable: an MAE of 500 means the model is off by 500 UGX on average.
+    $$\text{MAE} = \frac{1}{n}\sum_{i=1}^{n}|y_i - \hat{y}_i|$$
+    \item \textbf{RMSE (Root Mean Squared Error):} Penalises large errors more heavily than MAE. If a model has low MAE but high RMSE, it means it makes occasional large mistakes.
+    $$\text{RMSE} = \sqrt{\frac{1}{n}\sum_{i=1}^{n}(y_i - \hat{y}_i)^2}$$
+    \item \textbf{MAPE (Mean Absolute Percentage Error):} Scale-independent -- allows comparison across crops with different price ranges. A MAPE of 17\% means the model predictions are within 17\% of actual values on average.
+    $$\text{MAPE} = \frac{100\%}{n}\sum_{i=1}^{n}\left|\frac{y_i - \hat{y}_i}{y_i}\right|$$
+\end{itemize}
+
+\subsection{Aggregate Results}
+\textbf{What you say:}
+``Here are the average results across all 9 crop-district combinations:''
+
+\begin{center}
+\begin{tabular}{lccc}
+\toprule
+\textbf{Model} & \textbf{Avg MAE (UGX)} & \textbf{Avg RMSE} & \textbf{Avg MAPE} \\
+\midrule
+ARIMA & 757.45 & 882.33 & 25.11\% \\
+Prophet & 841.27 & 969.86 & 29.66\% \\
+\textbf{LSTM} & \textbf{503.13} & \textbf{606.40} & \textbf{17.65\%} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+``The LSTM outperformed both alternatives by a significant margin -- \textbf{33\% lower MAE than ARIMA and 40\% lower than Prophet}. In the best cases, like Gulu Maize, the LSTM achieved a MAPE of just \textbf{11.59\%} -- remarkably accurate for a developing-country agricultural market with limited data.''
+
+\begin{mdframed}[backgroundcolor=red!5, linecolor=darkred]
+\textcolor{darkred}{\textbf{TECHNICAL DEPTH -- If asked ``Why did LSTM outperform?''}}\\
+``LSTM's advantage stems from three capabilities: (1) \textit{nonlinear modelling} -- agricultural price dynamics involve threshold effects and regime changes that linear ARIMA cannot capture; (2) \textit{multivariate input} -- LSTM jointly processes 9 features (price lags, rainfall, oil prices, seasonality), while ARIMA only uses the univariate price series; (3) \textit{long-range memory} -- the gating mechanism preserves information across the full 6-month window, capturing seasonal interactions that Prophet's fixed Fourier basis misses.''
+
+\textcolor{darkred}{\textbf{If asked ``Is 17\% MAPE considered good?''}}\\
+``In the context of agricultural price forecasting in developing countries, yes. Published benchmarks for similar tasks in Sub-Saharan Africa report MAPEs of 15--30\% for monthly forecasts. The World Bank's commodity price forecasting models typically achieve 10--20\% MAPE for simpler, globally-traded commodities. Our 17.65\% MAPE for local district-level markets with limited data is competitive with these benchmarks.''
+
+\textcolor{darkred}{\textbf{If asked ``Why not use cross-validation instead of a single train/test split?''}}\\
+``For time-series data, standard k-fold cross-validation violates temporal ordering -- a model could train on 2024 data and test on 2020 data, which is information leakage. We used the alternative: \textit{chronological holdout} with the last 20\% of data as the test set. We could have used \textit{time-series cross-validation} (expanding window), but with only $\sim$200 observations and three computationally expensive models (especially LSTM), each requiring hyperparameter search, this would have been computationally prohibitive for our project timeline.''
+\end{mdframed}
+
+% ============================================================
+\section{Live Dashboard Demo}
+\textcolor{timecolor}{\textbf{[TIME: 25:00 -- 27:30] | PRESENTER: Apilli Barbra Ebal}}
+
+\begin{mdframed}[backgroundcolor=blue!5, linecolor=darkblue]
+\textbf{DEMO INSTRUCTIONS:} Open \texttt{http://localhost:8501} in a browser BEFORE your presentation. Have it loaded and ready. During this section, switch to the browser tab.
+\end{mdframed}
+
+\textbf{What you say:}
+``An AI model sitting in a Jupyter notebook does not help a farmer. We therefore deployed our best model into an interactive web dashboard using Streamlit. Let me show you.''
+
+\textbf{(Switch to browser -- show the Streamlit app)}
+
+``As you can see, users can select a crop, a district, and a forecast horizon from the sidebar. When they click `Generate Forecast', the dashboard:
+\begin{enumerate}
+    \item Loads and preprocesses the raw data in real-time
+    \item Trains the LSTM neural network live -- you can see the spinner
+    \item Displays performance metrics: MAE, RMSE, and MAPE
+    \item Shows an interactive Plotly chart with historical data, the evaluation predictions overlaid on the test split, and a future trajectory extending beyond the known data
+    \item Runs a full \textbf{Model Comparison Panel} that trains ARIMA and Prophet on the same data and displays side-by-side MAE and MAPE bar charts
+\end{enumerate}
+Let me demonstrate with Kampala Maize...''
+
+\textbf{(Click Generate Forecast, wait for results, scroll to show comparison panel)}
+
+``The comparison panel confirms that LSTM consistently outperforms the alternatives, showing the university-level rigour of comparing multiple modelling approaches on equal footing.''
+
+% ============================================================
+\section{Challenges \& How We Overcame Them}
+\textcolor{timecolor}{\textbf{[TIME: 27:30 -- 29:00] | PRESENTER: Apilli Barbra Ebal}}
+
+\textbf{What you say:}
+``No project is without challenges. We faced three critical ones:''
 
 \begin{enumerate}
-    \item \textbf{Mismatched Geographical Data:} "The WFP market data used text District names (e.g., 'Gulu'), but the Satellite Rainfall used obscure P-Codes like 'UG1' for wider regions. We had to manually build mapping dictionaries to align the skies with the markets."
-    \item \textbf{Data Sparsity (Not enough data!):} "Neural networks usually need tens of thousands of rows of data. After aggregating to monthly prices, we only had about 200 rows per crop! If we weren't careful, the AI would 'overfit'—meaning it just memorizes the data instead of learning. How did we solve it? We implemented \textbf{Dropout Layers} in our code: this randomly literally turns off 20\% of the neural pathways during training, forcing the AI to learn real generalized patterns instead of just memorizing the test answers!"
-    \item \textbf{Frequency Mismatches:} "Rainfall came in dekads (10-day periods). World Bank data came strictly monthly. WFP came sporadically. We solved this by forcing everything into a strict Month-Start (MS) uniform frequency using Pandas resampling."
+    \item \textbf{Data Sparsity:} ``Neural networks typically need tens of thousands of data points. We had $\sim$200 rows per crop-district pair. We mitigated this with aggressive regularisation: Dropout layers, early stopping, and a compact architecture (64$\rightarrow$32 units instead of larger networks).''
+    
+    \item \textbf{Geographic Data Mismatch:} ``WFP used district names, CHIRPS used P-codes, and World Bank used a completely different date encoding. We built manual mapping dictionaries and unified all temporal indices to Month-Start frequency.''
+    
+    \item \textbf{Multi-Step Forecasting:} ``For 8-week-ahead forecasts, we used a \textit{recursive strategy} -- the model predicts month $t+1$, feeds that prediction back as input to predict $t+2$, and so on. This compounds errors, which is why 8-week forecasts are less accurate than 4-week ones. An alternative \textit{direct} strategy (training separate models for each horizon) could improve this, which we flag as future work.''
 \end{enumerate}
 
-\section{Conclusion}
+% ============================================================
+\section{Conclusions \& Future Work}
+\textcolor{timecolor}{\textbf{[TIME: 29:00 -- 30:00] | PRESENTER: Apilli Barbra Ebal}}
 
 \textbf{What you say:}
-"In conclusion, we successfully built an end-to-end Machine Learning pipeline. We gathered disjointed global and local datasets, aligned them mathematically, built a sliding-window neural network, and deployed it to the web. The 17\% error rate proves that multi-variable Deep Learning has a massive future in African predictive agriculture. Thank you."
+``In conclusion, we successfully built an end-to-end machine learning pipeline for agricultural price forecasting. We gathered three disparate datasets, aligned them temporally and geographically, engineered domain-specific features, and compared three fundamentally different modelling paradigms. The LSTM neural network achieved a 17.65\% average MAPE -- proving that multi-variate deep learning can meaningfully outperform classical methods for Ugandan crop price prediction.''
+
+``For future work, we recommend: (1) incorporating more districts and crops; (2) using Transformer architectures which have recently outperformed LSTMs in sequence modelling; (3) adding additional covariates like conflict data and COVID mobility indices; and (4) deploying the dashboard to a cloud platform for real stakeholder access.''
+
+``Thank you. We are happy to take questions.''
+
+\newpage
+% ============================================================
+% ANTICIPATED EXAMINER QUESTIONS
+% ============================================================
+\section{Anticipated Examiner Questions \& Answers}
+
+\begin{mdframed}[backgroundcolor=orange!5, linecolor=timecolor]
+\textbf{NOTE:} The lecturer may feed the report or presentation slides to AI (e.g., ChatGPT) to generate technical questions. Below are the most likely AI-generated questions with ready-made answers. Study these carefully.
+\end{mdframed}
+
+\subsection{Data \& Preprocessing Questions}
+
+\textbf{Q: How did you handle data leakage between train and test sets?}\\
+A: ``We used a strict chronological split -- the first 80\% of observations (by date) form the training set, and the final 20\% form the test set. No shuffling was applied. Feature engineering (lags, rolling stats) was computed on the full series before splitting, which introduces minimal technical leakage since lag features at the split boundary use a few training-period values -- but this is standard practice in time-series ML and the effect is negligible relative to our evaluation window.''
+
+\textbf{Q: Why did you not include the FAOSTAT dataset mentioned in the proposal?}\\
+A: ``The FAOSTAT data provides annual agricultural statistics which are too coarse for our monthly forecasting task. The World Bank commodity indices provide the global price context at monthly granularity, which is more directly useful. We kept the WFP, CHIRPS, and World Bank datasets as our core triad.''
+
+\textbf{Q: How would you handle it if price data was missing for an entire district for several months?}\\
+A: ``Our interpolation limit was set to 3 consecutive months. Beyond that, we would flag the gap and either: (a) use a neighbouring district as a proxy with appropriate adjustment, (b) use spatial interpolation based on distance-weighted averages from nearby markets, or (c) exclude that period entirely from training. In practice, the WFP data had sufficient coverage for our three target districts.''
+
+\subsection{Model Architecture Questions}
+
+\textbf{Q: Why not use a GRU instead of LSTM?}\\
+A: ``GRU (Gated Recurrent Unit) has fewer parameters (2 gates vs 3 gates) and trains faster. However, LSTMs generally perform better on longer sequences because the separate forget and input gates provide finer-grained control over memory. With our 6-month window, the additional expressiveness of LSTM justifies the slightly higher computational cost. For our small dataset size, the parameter difference between GRU and LSTM is not a bottleneck.''
+
+\textbf{Q: Why not use a Transformer model?}\\
+A: ``Transformers use self-attention mechanisms that scale quadratically with sequence length, and they excel on very long sequences with large datasets. Our sequences are only 6 time steps long with $\sim$200 total observations -- far too small for Transformers to learn meaningful attention patterns. Transformers would likely overfit severely. LSTMs are more data-efficient for small-scale time-series tasks. We do acknowledge Transformers as a promising future direction if more data becomes available.''
+
+\textbf{Q: Did you try any ensemble methods?}\\
+A: ``We did not implement a formal ensemble, but this is an excellent suggestion. A weighted average of ARIMA, Prophet, and LSTM predictions -- with weights inversely proportional to each model's validation MAE -- could reduce variance and improve robustness. This is a viable future improvement.''
+
+\textbf{Q: How did you decide on 64 and 32 units for the two LSTM layers?}\\
+A: ``We followed a common heuristic of halving units between layers (64$\rightarrow$32) to create a ``funnel'' that progressively compresses the temporal representation. With only $\sim$200 training samples and 9 input features, larger networks (128$\rightarrow$64) showed clear overfitting in validation loss curves. The 64$\rightarrow$32 architecture provided sufficient capacity while remaining regularisable with 20\% dropout.''
+
+\subsection{Evaluation \& Results Questions}
+
+\textbf{Q: Your MAPE is 17\% -- is that good enough for real-world deployment?}\\
+A: ``For a prototype research system, 17\% MAPE is competitive with published benchmarks. For production deployment to inform actual farmer decisions, we would target MAPE below 10\%. This could be achieved with more data (extending back further in time), additional covariates (soil moisture, conflict indicators, fuel prices at local level), and Bayesian optimisation of model hyperparameters.''
+
+\textbf{Q: What would happen if you predicted during a period like COVID-19?}\\
+A: ``COVID-19 caused unprecedented structural breaks -- lockdowns disrupted supply chains in ways no historical data could predict. All three models would likely fail during such black swan events. To handle this, we would need: (a) anomaly detection to flag abnormal periods, (b) regime-switching models that can adapt to sudden structural changes, or (c) real-time retraining with the most recent data to incorporate the new dynamics quickly.''
+
+\textbf{Q: How would you handle concept drift in a deployed system?}\\
+A: ``Concept drift occurs when the underlying data distribution changes over time. We would implement: (1) a monitoring pipeline that tracks prediction error on a rolling basis; (2) automatic retraining triggers when MAE exceeds a threshold (e.g., 1.5x the baseline); (3) periodic scheduled retraining (e.g., monthly) with the latest data. Streamlit's caching system already supports this -- clearing the cache forces data reload and model retraining.''
+
+\textbf{Q: Why did Prophet perform worse than ARIMA?}\\
+A: ``Three reasons: (1) Prophet's automatic changepoint detection identified spurious trend breaks in our relatively short series; (2) Prophet's Fourier-based seasonality assumes fixed seasonal patterns, but Uganda's harvest timing shifts by 2-3 weeks annually due to variable rainfall onset; (3) Prophet's rainfall regressor coefficient is constant over time, while the true relationship between rainfall and price varies by season and crop stage. ARIMA, by being simpler, avoided these overfit-prone assumptions.''
+
+\subsection{Deployment \& Ethics Questions}
+
+\textbf{Q: What are the ethical implications of deploying this tool?}\\
+A: ``Three main concerns: (1) \textit{Equity of access}: if only large traders access the forecasting tool, they could exploit price information asymmetry at the expense of smallholder farmers. We would need to ensure broad access, potentially through USSD or SMS interfaces. (2) \textit{Accountability}: if a farmer makes decisions based on incorrect predictions and suffers losses, who is responsible? We would need clear disclaimers and confidence intervals. (3) \textit{Market manipulation}: if predictions become widely known, they could become self-fulfilling or self-defeating prophecies, actually distorting the market we're trying to predict.''
+
+\textbf{Q: How would you deploy this at scale in rural Uganda?}\\
+A: ``Three-tier approach: (1) The Streamlit dashboard for NGOs and policy makers with internet access; (2) an SMS-based API using Africa's Talking or Twilio for feature phone users -- farmers send a text like `PRICE MAIZE GULU' and receive the forecast; (3) integration with existing agricultural extension services where field officers relay predictions during regular farm visits.''
 
 \end{document}

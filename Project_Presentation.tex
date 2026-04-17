@@ -1,0 +1,600 @@
+\documentclass[aspectratio=169,11pt]{beamer}
+
+\usetheme{Madrid}
+\usecolortheme{whale}
+\usepackage[utf8]{inputenc}
+\usepackage{booktabs}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usepackage{xcolor}
+
+% Custom colours
+\definecolor{ucuBlue}{RGB}{0,51,102}
+\definecolor{ucuGold}{RGB}{204,153,0}
+\definecolor{lstmGreen}{RGB}{46,204,113}
+\definecolor{arimaBlue}{RGB}{52,152,219}
+\definecolor{prophetRed}{RGB}{231,76,60}
+
+\setbeamercolor{palette primary}{bg=ucuBlue,fg=white}
+\setbeamercolor{palette secondary}{bg=ucuBlue!80,fg=white}
+\setbeamercolor{palette tertiary}{bg=ucuBlue!60,fg=white}
+\setbeamercolor{structure}{fg=ucuBlue}
+\setbeamercolor{block title}{bg=ucuBlue,fg=white}
+\setbeamercolor{block body}{bg=ucuBlue!5}
+
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{footline}[frame number]
+
+\title[Crop Price Forecasting]{\textbf{Market Price Forecasting for\\Ugandan Staple Crops}}
+\subtitle{A Multi-Model Time-Series Approach Using WFP Market Data and Climate Covariates}
+\author[Group 3]{
+    Jamugisa Peter Paul \textnormal{(B35503 -- S25M25/008)} \\
+    ILEGO Cynthia Cecilia \textnormal{(B35502 -- S25M25/007)} \\
+    AYEBARE Moses \textnormal{(B35498 -- S25M25/003)} \\
+    Apilli Barbra Ebal \textnormal{(B35496 -- S25M25/001)}
+}
+\institute[UCU]{
+    Department of Computer Science \\
+    Uganda Christian University \\[0.3em]
+    \textit{MSc Computer Science -- AI \& Machine Learning}
+}
+\date{April 2025}
+
+\begin{document}
+
+% ============================================================
+% TITLE SLIDE
+% ============================================================
+\begin{frame}
+\titlepage
+\end{frame}
+
+% ============================================================
+% OUTLINE
+% ============================================================
+\begin{frame}{Presentation Outline}
+\tableofcontents
+\end{frame}
+
+% ============================================================
+% SECTION 1: INTRODUCTION
+% ============================================================
+\section{Introduction \& Problem Statement}
+
+\begin{frame}{The Problem: Food Insecurity through Price Volatility}
+\begin{columns}
+\begin{column}{0.55\textwidth}
+\begin{itemize}
+    \item Agriculture = \textbf{24\% of Uganda's GDP}, employs \textbf{70\%+} of workforce
+    \item Staple crops: \textbf{Maize, Beans, Cassava}
+    \item Prices fluctuate \textbf{30--50\%} between seasons
+    \item Smallholder farmers sell post-harvest at \textbf{lowest prices}
+    \item Existing WFP/FEWS NET systems are \textbf{retrospective}, not predictive
+\end{itemize}
+\vspace{0.5em}
+\begin{block}{Our Solution}
+Build a machine learning system that forecasts crop prices \textbf{4--8 weeks ahead}
+\end{block}
+\end{column}
+\begin{column}{0.42\textwidth}
+\begin{block}{Impact}
+\begin{itemize}
+    \item[\checkmark] Farmers optimise selling timing
+    \item[\checkmark] NGOs pre-position food aid
+    \item[\checkmark] Policymakers plan interventions
+\end{itemize}
+\end{block}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Research Question \& Objectives}
+\begin{block}{Research Question}
+\textit{How accurately can machine learning models forecast staple crop market prices 4--8 weeks ahead in Uganda, and which model -- ARIMA, Prophet, or LSTM -- achieves the best performance when rainfall is incorporated as a predictor?}
+\end{block}
+
+\vspace{0.5em}
+\textbf{Five Objectives:}
+\begin{enumerate}
+    \item \textbf{Collect \& Merge} WFP prices + CHIRPS rainfall + World Bank commodity indices
+    \item \textbf{Engineer Features:} lags, rolling stats, seasonal encoding, climate covariates
+    \item \textbf{Implement 3 Models:} ARIMA, Facebook Prophet, LSTM
+    \item \textbf{Evaluate \& Compare} using MAE, RMSE, MAPE (80/20 chronological split)
+    \item \textbf{Deploy} best model in interactive Streamlit dashboard
+\end{enumerate}
+\end{frame}
+
+% ============================================================
+% SECTION 2: DATA
+% ============================================================
+\section{Data Pipeline}
+
+\begin{frame}{Three Heterogeneous Data Sources}
+\begin{table}
+\centering
+\small
+\begin{tabular}{p{3cm}p{4cm}p{4cm}p{2.5cm}}
+\toprule
+\textbf{Dataset} & \textbf{Source} & \textbf{Content} & \textbf{Role} \\
+\midrule
+WFP Food Prices & Humanitarian Data Exchange & Market prices (UGX) for crops across districts & \textbf{Target variable} \\
+\midrule
+CHIRPS Rainfall & UC Santa Barbara satellite & Monthly rainfall (mm) by region & \textbf{Climate covariate} \\
+\midrule
+World Bank Commodities & World Bank & Global crude oil \& maize indices & \textbf{Global proxy} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\vspace{0.3em}
+\textbf{Scope:} 3 crops $\times$ 3 districts $\times$ 14 years (2010--2024)
+
+\begin{columns}
+\begin{column}{0.33\textwidth}
+\centering \textbf{Crops}\\Maize, Beans, Cassava flour
+\end{column}
+\begin{column}{0.33\textwidth}
+\centering \textbf{Districts}\\Kampala, Gulu, Mbale
+\end{column}
+\begin{column}{0.33\textwidth}
+\centering \textbf{Observations}\\$\sim$150--200 per pair
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Data Integration Challenges}
+\begin{columns}
+\begin{column}{0.48\textwidth}
+\begin{alertblock}{Challenge 1: Geographic Mismatch}
+\begin{itemize}
+    \item WFP: text names (``Gulu'')
+    \item CHIRPS: ISO P-codes (``UG1'')
+    \item \textbf{Solution:} Manual mapping dictionary
+\end{itemize}
+\end{alertblock}
+
+\begin{alertblock}{Challenge 2: Temporal Mismatch}
+\begin{itemize}
+    \item WFP: irregular weekly/monthly
+    \item CHIRPS: dekadal (10-day)
+    \item World Bank: ``2023M06'' format
+    \item \textbf{Solution:} Resample all to Month-Start (MS)
+\end{itemize}
+\end{alertblock}
+\end{column}
+\begin{column}{0.48\textwidth}
+\begin{alertblock}{Challenge 3: Missing Values}
+\begin{itemize}
+    \item Price gaps of 1--3 months
+    \item \textbf{Solution:} Linear interpolation (limit=3)
+    \item Covariates: forward-fill + backward-fill
+\end{itemize}
+\end{alertblock}
+
+\begin{block}{Final Merged Dataset}
+Per (crop, district) pair:
+\begin{itemize}
+    \item $\sim$150--180 monthly observations
+    \item Columns: price, rainfall, oil, maize index
+    \item All temporally aligned
+\end{itemize}
+\end{block}
+\end{column}
+\end{columns}
+\end{frame}
+
+% ============================================================
+% SECTION 3: FEATURE ENGINEERING
+% ============================================================
+\section{Feature Engineering}
+
+\begin{frame}{Transforming Raw Data into AI-Ready Features}
+\begin{columns}
+\begin{column}{0.48\textwidth}
+\begin{block}{1. Price Lag Features}
+$$\text{price\_lag}_k(t) = \text{price}(t - k)$$
+$k \in \{1, 2, 4, 8\}$ -- captures momentum \& trends
+\end{block}
+
+\begin{block}{2. Rolling Statistics}
+$$\text{roll\_mean}_w(t) = \frac{1}{w}\sum_{i=0}^{w-1} \text{price}(t-i)$$
+Windows: 4 months, 8 months\\
+Also: rolling std.\ dev.\ (measures volatility)
+\end{block}
+\end{column}
+\begin{column}{0.48\textwidth}
+\begin{block}{3. Sinusoidal Seasonal Encoding}
+$$\text{month\_sin} = \sin\left(\frac{2\pi m}{12}\right)$$
+$$\text{month\_cos} = \cos\left(\frac{2\pi m}{12}\right)$$
+Preserves cyclical continuity (Dec $\leftrightarrow$ Jan)
+\end{block}
+
+\begin{block}{4. Climate Lags}
+$$\text{rain\_lag}_k(t) = \text{rainfall}(t - k)$$
+$k \in \{1, 4, 8\}$ -- rainfall today affects prices in 4 months (growing cycle)
+\end{block}
+\end{column}
+\end{columns}
+
+\vspace{0.5em}
+\centering\textbf{5. Global Covariates:} World Bank crude oil + maize indices (transport cost proxies)
+\end{frame}
+
+% ============================================================
+% SECTION 4: MODELS
+% ============================================================
+\section{Model Architectures}
+
+\begin{frame}{Model 1: ARIMA -- Classical Statistical Baseline}
+\begin{columns}
+\begin{column}{0.55\textwidth}
+\textbf{ARIMA(p, d, q):}
+$$y'_t = c + \sum_{i=1}^{p}\phi_i y'_{t-i} + \sum_{j=1}^{q}\theta_j \varepsilon_{t-j} + \varepsilon_t$$
+
+\begin{itemize}
+    \item \textbf{AR($p$):} Linear combination of past values
+    \item \textbf{I($d$):} Differencing for stationarity
+    \item \textbf{MA($q$):} Past forecast errors for self-correction
+\end{itemize}
+
+\textbf{Order Selection:} Exhaustive AIC grid search
+$$\text{AIC} = 2k - 2\ln(\hat{L})$$
+$p \in \{0..3\}$, $d \in \{0,1\}$, $q \in \{0..3\}$ = 32 candidates/pair
+\end{column}
+\begin{column}{0.4\textwidth}
+\begin{block}{Strengths}
+\begin{itemize}
+    \item[\textcolor{lstmGreen}{\checkmark}] Interpretable coefficients
+    \item[\textcolor{lstmGreen}{\checkmark}] No overfitting risk (few params)
+    \item[\textcolor{lstmGreen}{\checkmark}] Works well on stationary data
+\end{itemize}
+\end{block}
+\begin{alertblock}{Limitations}
+\begin{itemize}
+    \item[\textcolor{prophetRed}{$\times$}] Linear assumptions
+    \item[\textcolor{prophetRed}{$\times$}] Univariate only
+    \item[\textcolor{prophetRed}{$\times$}] Struggles with regime changes
+\end{itemize}
+\end{alertblock}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Model 2: Facebook Prophet -- Additive Decomposition}
+\begin{columns}
+\begin{column}{0.55\textwidth}
+\textbf{Prophet Decomposition:}
+$$y(t) = g(t) + s(t) + \beta_{\text{rain}} \cdot \text{rainfall}(t) + \varepsilon_t$$
+
+\begin{itemize}
+    \item $g(t)$ = \textbf{Piecewise linear trend} with automatic changepoint detection
+    \item $s(t)$ = \textbf{Fourier seasonal component}:
+    $$s(t) = \sum_{n=1}^{N}\left(a_n\cos\frac{2\pi nt}{P} + b_n\sin\frac{2\pi nt}{P}\right)$$
+    \item $\beta_{\text{rain}}$ = Learned rainfall coefficient
+\end{itemize}
+\end{column}
+\begin{column}{0.4\textwidth}
+\begin{block}{Strengths}
+\begin{itemize}
+    \item[\textcolor{lstmGreen}{\checkmark}] Handles missing data
+    \item[\textcolor{lstmGreen}{\checkmark}] Strong yearly seasonality
+    \item[\textcolor{lstmGreen}{\checkmark}] External regressors
+\end{itemize}
+\end{block}
+\begin{alertblock}{Limitations}
+\begin{itemize}
+    \item[\textcolor{prophetRed}{$\times$}] Fixed Fourier seasonality
+    \item[\textcolor{prophetRed}{$\times$}] Spurious changepoints
+    \item[\textcolor{prophetRed}{$\times$}] Designed for business data
+\end{itemize}
+\end{alertblock}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Model 3: LSTM -- Deep Learning Neural Network}
+\begin{columns}
+\begin{column}{0.55\textwidth}
+\textbf{LSTM Gating Mechanism:}
+\begin{align*}
+f_t &= \sigma(W_f \cdot [h_{t-1}, x_t] + b_f) & \text{Forget Gate}\\
+i_t &= \sigma(W_i \cdot [h_{t-1}, x_t] + b_i) & \text{Input Gate}\\
+o_t &= \sigma(W_o \cdot [h_{t-1}, x_t] + b_o) & \text{Output Gate}\\
+C_t &= f_t \odot C_{t-1} + i_t \odot \tilde{C}_t & \text{Cell State}
+\end{align*}
+
+\textbf{Cell state = ``memory highway''} carries information across time steps without degradation
+
+\vspace{0.3em}
+Solves \textbf{vanishing gradient problem} of standard RNNs
+\end{column}
+\begin{column}{0.4\textwidth}
+\begin{block}{Our Architecture}
+\small
+\begin{tabular}{ll}
+Layer 1 & LSTM (64 units) \\
+Dropout & 20\% \\
+Layer 2 & LSTM (32 units) \\
+Dropout & 20\% \\
+Output & Dense (1 unit) \\
+\midrule
+Window & 6 months \\
+Features & 9 inputs \\
+Optimiser & Adam \\
+Loss & MSE \\
+Epochs & 100 (early stop) \\
+\end{tabular}
+\end{block}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{LSTM: Multivariate Sliding Window Approach}
+\begin{block}{9-Feature Input Vector (per time step)}
+\centering
+\begin{tabular}{ll}
+\texttt{price} & Current price (UGX) \\
+\texttt{rainfall} & Monthly rainfall (mm) \\
+\texttt{wb\_crude\_oil} & Global oil index \\
+\texttt{wb\_maize} & Global maize index \\
+\texttt{price\_lag\_1} & Price 1 month ago \\
+\texttt{price\_lag\_2} & Price 2 months ago \\
+\texttt{month\_sin} & Seasonal indicator \\
+\texttt{month\_cos} & Seasonal indicator \\
+\texttt{rain\_lag\_1} & Rainfall 1 month ago \\
+\end{tabular}
+\end{block}
+
+\vspace{0.5em}
+\begin{columns}
+\begin{column}{0.48\textwidth}
+\begin{block}{Sliding Window}
+Examines \textbf{6 consecutive months} of all 9 features to predict \textbf{month 7's price}
+\end{block}
+\end{column}
+\begin{column}{0.48\textwidth}
+\begin{block}{Normalisation}
+MinMaxScaler: $x_{\text{scaled}} = \frac{x - x_{\min}}{x_{\max} - x_{\min}}$\\
+Ensures all features contribute equally
+\end{block}
+\end{column}
+\end{columns}
+\end{frame}
+
+% ============================================================
+% SECTION 5: RESULTS
+% ============================================================
+\section{Results \& Evaluation}
+
+\begin{frame}{Evaluation Metrics}
+\begin{columns}
+\begin{column}{0.33\textwidth}
+\begin{block}{MAE}
+$$\frac{1}{n}\sum|y_i - \hat{y}_i|$$
+\centering Average error\\in UGX\\
+\textit{Most interpretable}
+\end{block}
+\end{column}
+\begin{column}{0.33\textwidth}
+\begin{block}{RMSE}
+$$\sqrt{\frac{1}{n}\sum(y_i - \hat{y}_i)^2}$$
+\centering Penalises large\\errors more\\
+\textit{Sensitive to outliers}
+\end{block}
+\end{column}
+\begin{column}{0.33\textwidth}
+\begin{block}{MAPE}
+$$\frac{100\%}{n}\sum\left|\frac{y_i - \hat{y}_i}{y_i}\right|$$
+\centering Scale-independent\\percentage\\
+\textit{Cross-crop comparison}
+\end{block}
+\end{column}
+\end{columns}
+
+\vspace{1em}
+\centering
+\textbf{Evaluation Protocol:} Strict chronological \textbf{80/20 split}\\
+No shuffling $\rightarrow$ No data leakage $\rightarrow$ No future information in training
+\end{frame}
+
+\begin{frame}{Aggregate Results: LSTM Dominates}
+\begin{table}
+\centering
+\large
+\begin{tabular}{lccc}
+\toprule
+\textbf{Model} & \textbf{Avg MAE (UGX)} & \textbf{Avg RMSE} & \textbf{Avg MAPE} \\
+\midrule
+\textcolor{arimaBlue}{ARIMA} & \textcolor{arimaBlue}{757.45} & \textcolor{arimaBlue}{882.33} & \textcolor{arimaBlue}{25.11\%} \\
+\textcolor{prophetRed}{Prophet} & \textcolor{prophetRed}{841.27} & \textcolor{prophetRed}{969.86} & \textcolor{prophetRed}{29.66\%} \\
+\textcolor{lstmGreen}{\textbf{LSTM}} & \textcolor{lstmGreen}{\textbf{503.13}} & \textcolor{lstmGreen}{\textbf{606.40}} & \textcolor{lstmGreen}{\textbf{17.65\%}} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\vspace{0.5em}
+\begin{columns}
+\begin{column}{0.48\textwidth}
+\begin{block}{LSTM Advantage}
+\begin{itemize}
+    \item \textbf{33\% lower MAE} than ARIMA
+    \item \textbf{40\% lower MAE} than Prophet
+    \item Best MAPE: \textbf{11.59\%} (Gulu Maize)
+\end{itemize}
+\end{block}
+\end{column}
+\begin{column}{0.48\textwidth}
+\begin{block}{Why LSTM Wins}
+\begin{enumerate}
+    \item Nonlinear modelling capacity
+    \item Multivariate (9 features vs 1)
+    \item Long-range memory via gating
+\end{enumerate}
+\end{block}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{District-Level Performance Breakdown}
+\begin{table}
+\centering
+\footnotesize
+\begin{tabular}{llccc}
+\toprule
+\textbf{District} & \textbf{Crop} & \textbf{ARIMA MAPE} & \textbf{Prophet MAPE} & \textbf{LSTM MAPE} \\
+\midrule
+Kampala & Maize & 40.66\% & 37.13\% & \textbf{31.33\%} \\
+Kampala & Beans & 48.35\% & 35.59\% & \textbf{18.15\%} \\
+Kampala & Cassava flour & 29.40\% & 28.40\% & \textbf{18.84\%} \\
+\midrule
+Gulu & Maize & 13.49\% & 26.39\% & \textbf{11.59\%} \\
+Gulu & Beans & 18.60\% & 16.18\% & \textbf{12.22\%} \\
+Gulu & Cassava flour & 22.67\% & \textbf{12.34\%} & 20.01\% \\
+\midrule
+Mbale & Maize & \textbf{12.25\%} & 18.37\% & 14.22\% \\
+Mbale & Beans & \textbf{11.52\%} & 52.50\% & 11.78\% \\
+Mbale & Cassava flour & 29.08\% & 40.07\% & \textbf{20.75\%} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\vspace{0.5em}
+\centering
+\textbf{Key Insight:} LSTM wins \textbf{7 out of 9} pairs. ARIMA is competitive in Mbale (simpler, more stable market). Prophet wins only for Gulu Cassava (strong annual seasonality).
+\end{frame}
+
+% ============================================================
+% SECTION 6: DEPLOYMENT
+% ============================================================
+\section{Streamlit Dashboard}
+
+\begin{frame}{Interactive Web Dashboard}
+\begin{columns}
+\begin{column}{0.55\textwidth}
+\textbf{Dashboard Features:}
+\begin{enumerate}
+    \item \textbf{User Controls:} Select crop, district, forecast horizon
+    \item \textbf{Real-time LSTM Training:} Model trains live on-the-fly
+    \item \textbf{Interactive Plotly Chart:}
+    \begin{itemize}
+        \item Historical prices (train split)
+        \item Test actuals vs LSTM predictions
+        \item Future forecast trajectory
+    \end{itemize}
+    \item \textbf{Performance Metrics:} MAE, RMSE, MAPE displayed
+    \item \textbf{Model Comparison Panel:} ARIMA vs Prophet vs LSTM side-by-side
+\end{enumerate}
+\end{column}
+\begin{column}{0.42\textwidth}
+\begin{block}{Technology Stack}
+\begin{itemize}
+    \item \textbf{Framework:} Streamlit
+    \item \textbf{Charts:} Plotly (interactive)
+    \item \textbf{Backend:} TensorFlow/Keras
+    \item \textbf{Caching:} \texttt{@st.cache\_data}
+    \item \textbf{Command:} \texttt{streamlit run app.py}
+\end{itemize}
+\end{block}
+
+\begin{alertblock}{Live Demo}
+\centering \textbf{[SWITCH TO BROWSER]}\\
+\texttt{http://localhost:8501}
+\end{alertblock}
+\end{column}
+\end{columns}
+\end{frame}
+
+% ============================================================
+% SECTION 7: CHALLENGES
+% ============================================================
+\section{Challenges \& Limitations}
+
+\begin{frame}{Challenges Faced \& Overcome}
+\begin{columns}
+\begin{column}{0.48\textwidth}
+\begin{block}{1. Data Sparsity}
+\textbf{Problem:} Neural networks need 10,000+ rows; we had $\sim$200\\
+\textbf{Solution:}
+\begin{itemize}
+    \item Dropout (20\%) -- implicit ensemble
+    \item Early stopping (patience=10)
+    \item Compact architecture (64$\rightarrow$32)
+\end{itemize}
+\end{block}
+
+\begin{block}{2. Geographic Mismatch}
+\textbf{Problem:} Three datasets use different spatial identifiers\\
+\textbf{Solution:} Manual mapping dictionaries aligning districts to P-codes
+\end{block}
+\end{column}
+\begin{column}{0.48\textwidth}
+\begin{block}{3. Multi-step Forecasting}
+\textbf{Problem:} Error compounds recursively\\
+\textbf{Solution:} Recursive strategy with updated lag features at each step
+\end{block}
+
+\begin{alertblock}{Known Limitations}
+\begin{itemize}
+    \item Single train/test split (vs.\ time-series CV)
+    \item No confidence intervals
+    \item ARIMA used without exogenous vars
+    \item Models cannot predict black swan events (e.g., COVID)
+\end{itemize}
+\end{alertblock}
+\end{column}
+\end{columns}
+\end{frame}
+
+% ============================================================
+% SECTION 8: CONCLUSIONS
+% ============================================================
+\section{Conclusions \& Future Work}
+
+\begin{frame}{Conclusions}
+\begin{block}{What We Achieved}
+\begin{enumerate}
+    \item Built an \textbf{end-to-end ML pipeline}: data collection $\rightarrow$ preprocessing $\rightarrow$ feature engineering $\rightarrow$ modelling $\rightarrow$ evaluation $\rightarrow$ deployment
+    \item Merged \textbf{3 heterogeneous datasets} (WFP + CHIRPS + World Bank)
+    \item Trained and compared \textbf{3 fundamentally different models}
+    \item LSTM achieved \textbf{17.65\% average MAPE} -- competitive with published benchmarks
+    \item Deployed to an \textbf{interactive Streamlit dashboard} with model comparison
+\end{enumerate}
+\end{block}
+
+\begin{block}{Future Work}
+\begin{columns}
+\begin{column}{0.48\textwidth}
+\begin{itemize}
+    \item Transformer architectures
+    \item Model ensembling (learned weights)
+    \item Additional covariates (conflict, mobility)
+\end{itemize}
+\end{column}
+\begin{column}{0.48\textwidth}
+\begin{itemize}
+    \item Probabilistic forecasts (intervals)
+    \item Cloud deployment (AWS/GCP)
+    \item SMS/USSD for farmer access
+\end{itemize}
+\end{column}
+\end{columns}
+\end{block}
+\end{frame}
+
+% ============================================================
+% THANK YOU
+% ============================================================
+\begin{frame}{}
+\centering
+\vspace{2cm}
+{\Huge\textbf{Thank You}}\\[1em]
+{\Large Questions \& Discussion}\\[2em]
+\begin{tabular}{ll}
+\textbf{Repository:} & \url{https://github.com/Jamugisa-Peter-Paul/Price-forcasting} \\
+\textbf{Dashboard:} & \texttt{streamlit run app.py} \\
+\end{tabular}\\[1.5em]
+\small Jamugisa Peter Paul $\bullet$ ILEGO Cynthia Cecilia $\bullet$ AYEBARE Moses $\bullet$ Apilli Barbra Ebal
+\end{frame}
+
+\end{document}
